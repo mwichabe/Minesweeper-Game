@@ -12,8 +12,10 @@ public class BoardPanel extends JPanel {
     private boolean[][] mineLocations;
     private boolean[][] revealed;
     private boolean[][] markedAsMine;
+    private Minesweeper minesweeper;
 
-    public BoardPanel() {
+    public BoardPanel(Minesweeper minesweeper) {
+        this.minesweeper = minesweeper;
         addMouseListener(new MinesweeperMouseListener());
         setPreferredSize(new Dimension(400, 400));  // Set default window size
         initializeBoard(10, 10, 10);
@@ -81,28 +83,51 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    private class MinesweeperMouseListener extends MouseAdapter {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            int row = e.getY() / 20;  // Adjust based on cell size
-            int col = e.getX() / 20;  // Adjust based on cell size
+   // Modify the MinesweeperMouseListener class inside the BoardPanel class
+private class MinesweeperMouseListener extends MouseAdapter {
+    @Override
+    public void mousePressed(MouseEvent e) {
+        int row = e.getY() / 20;  // Adjust based on cell size
+        int col = e.getX() / 20;  // Adjust based on cell size
 
-            // Handle left mouse click
-            if (SwingUtilities.isLeftMouseButton(e)) {
-                revealCell(row, col);
+        // Handle left mouse click
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            revealCell(row, col);
+        }
+    }
+}
+
+// Modify the revealCell method
+private void revealCell(int row, int col) {
+    if (!revealed[row][col]) {
+        revealed[row][col] = true;
+
+        if (mineLocations[row][col]) {
+            // Game Over logic
+            System.out.println("Game Over!");
+            minesweeper.endGame(); // Call endGame from Minesweeper
+        } else {
+            // Check if the game is won
+            if (checkGameWon()) {
+                minesweeper.endGame();
+                // JOptionPane.showMessageDialog(minesweeper.this.frame, "Congratulations! You won!");
+            }
+        }
+
+        repaint();
+    }
+}
+
+// Add the following method to check if the game is won
+private boolean checkGameWon() {
+    int revealedCount = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (revealed[i][j] && !mineLocations[i][j]) {
+                revealedCount++;
             }
         }
     }
-
-    private void revealCell(int row, int col) {
-        if (!revealed[row][col]) {
-            revealed[row][col] = true;
-
-            if (mineLocations[row][col]) {
-                System.out.println("Game Over!");
-            }
-
-            repaint();
-        }
-    }
+    return revealedCount == (rows * cols - mines);
+}
 }

@@ -12,12 +12,11 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Minesweeper {
+public class Minesweeper extends JFrame{
 
     private JFrame frame;
     private JPanel panel;
     private JLabel timeLabel;
-
     private int rows, cols, mines;
     private Cell[][] cells;
     private int coveredCells;
@@ -38,7 +37,7 @@ public class Minesweeper {
 
     public Minesweeper() {
         initialize();
-        frame.add(panel);
+        frame.add(new BoardPanel(this)); 
         timeLabel = new JLabel();
         frame.add(timeLabel, BorderLayout.NORTH);
         startTime = System.currentTimeMillis();
@@ -54,6 +53,7 @@ public class Minesweeper {
         setDifficulty(difficulty);
 
         frame = new JFrame("Minesweeper");
+        new BoardPanel(this); 
         panel = new JPanel(new GridLayout(rows, cols));
 
         for (int i = 0; i < rows; i++) {
